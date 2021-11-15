@@ -1,0 +1,292 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 d/fs/student/jaoviedo/MIPS_single_cycle_proc
+vALU
+!s110 1636964807
+!i10b 1
+!s100 ba0BcT=TK95^`n0am4M121
+I2n@_1WUiaYSi4ncf9OoaC1
+Z1 VDg1SIo80bB@j0V0VzS_@n1
+R0
+Z2 w1636964177
+8/fs/student/jaoviedo/MIPS_single_cycle_proc/ALU.v
+F/fs/student/jaoviedo/MIPS_single_cycle_proc/ALU.v
+L0 1
+Z3 OL;L;10.6e;65
+r1
+!s85 0
+31
+Z4 !s108 1636964807.000000
+Z5 !s107 /fs/student/jaoviedo/MIPS_single_cycle_proc/mips.v|/fs/student/jaoviedo/MIPS_single_cycle_proc/ALU.v|/fs/student/jaoviedo/MIPS_single_cycle_proc/mipstop.v|/fs/student/jaoviedo/MIPS_single_cycle_proc/mipsmem.v|/fs/student/jaoviedo/MIPS_single_cycle_proc/mips_testbench.v|
+Z6 !s90 -##implicit##push_minusfile_path##|/fs/student/jaoviedo/MIPS_single_cycle_proc/vlog.opt|-##implicit##pop_minusfile_path##|-reportprogress|300|-work|work|/fs/student/jaoviedo/MIPS_single_cycle_proc/mips_testbench.v|/fs/student/jaoviedo/MIPS_single_cycle_proc/mipsmem.v|/fs/student/jaoviedo/MIPS_single_cycle_proc/mipstop.v|/fs/student/jaoviedo/MIPS_single_cycle_proc/ALU.v|/fs/student/jaoviedo/MIPS_single_cycle_proc/mips.v|
+!i113 0
+Z7 o-work work -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+Z8 tCvgOpt 0
+n@a@l@u
+vcontroller
+R1
+r1
+!s85 0
+31
+!i10b 1
+!s100 QCh0JaRoFAAkno[nj9]Gi0
+I:9X2KlLa3X>:NcE8MX@U:1
+R0
+R2
+Z9 8/fs/student/jaoviedo/MIPS_single_cycle_proc/mips.v
+Z10 F/fs/student/jaoviedo/MIPS_single_cycle_proc/mips.v
+L0 33
+R3
+R4
+R5
+R6
+!i113 0
+R7
+R8
+vdatapath
+R1
+r1
+!s85 0
+31
+!i10b 1
+!s100 @Zl>DNM;RF`z8cndm]5gJ2
+I5f?hFYC7SfPzco9i8>RfS2
+R0
+R2
+R9
+R10
+L0 110
+R3
+R4
+R5
+R6
+!i113 0
+R7
+R8
+vdmem
+R1
+r1
+!s85 0
+31
+!i10b 1
+!s100 RaAjE>LfO0o26o^l6FW6S2
+ISP[M8`AiaBN3<WkdNFB?n0
+R0
+R2
+Z11 8/fs/student/jaoviedo/MIPS_single_cycle_proc/mipsmem.v
+Z12 F/fs/student/jaoviedo/MIPS_single_cycle_proc/mipsmem.v
+L0 4
+R3
+R4
+R5
+R6
+!i113 0
+R7
+R8
+vflopr
+R1
+r1
+!s85 0
+31
+!i10b 1
+!s100 h^4]:DPF3Im7IhYgKzRd91
+IXK4P5BQQnBWH1EB7I?=8C3
+R0
+R2
+R9
+R10
+L0 194
+R3
+R4
+R5
+R6
+!i113 0
+R7
+R8
+vimem
+R1
+r1
+!s85 0
+31
+!i10b 1
+!s100 55j@eNd]KCJYQ:DOOnQTk0
+I7PS[g=GEGg1fW[3`IOd`O2
+R0
+R2
+R11
+R12
+L0 23
+R3
+R4
+R5
+R6
+!i113 0
+R7
+R8
+vmaindec
+R1
+r1
+!s85 0
+31
+!i10b 1
+!s100 E;EgfPj4zV320azm4iU?L3
+IeDhU?HNg5b8PEE4EhifgB0
+R0
+R2
+R9
+R10
+L0 60
+R3
+R4
+R5
+R6
+!i113 0
+R7
+R8
+vmips
+R1
+r1
+!s85 0
+31
+!i10b 1
+!s100 0L]gZl:loRhL0fN?j>?_72
+IPnkDU`30a`R1dQ=b@X@PT3
+R0
+R2
+R9
+R10
+L0 4
+R3
+R4
+R5
+R6
+!i113 0
+R7
+R8
+vmux2
+R1
+r1
+!s85 0
+31
+!i10b 1
+!s100 z1=h?goD6j6dl5L08550W2
+ICO8ViAzjbB`TJBDOkMlIj1
+R0
+R2
+R9
+R10
+L0 210
+R3
+R4
+R5
+R6
+!i113 0
+R7
+R8
+vregfile
+R1
+r1
+!s85 0
+31
+!i10b 1
+!s100 ^z@Ce]XLFfjBMzMP=1:D;2
+Ineo:`c4kOoYd>jU?IX9h;2
+R0
+R2
+R9
+R10
+L0 154
+R3
+R4
+R5
+R6
+!i113 0
+R7
+R8
+vsignextend
+R1
+r1
+!s85 0
+31
+!i10b 1
+!s100 S8YNgDd<O2z^R[BIT>5oE3
+IT?2bIAgiMWA>Ga8_a_nXS2
+R0
+R2
+R9
+R10
+L0 180
+R3
+R4
+R5
+R6
+!i113 0
+R7
+R8
+vsl2
+R1
+r1
+!s85 0
+31
+!i10b 1
+!s100 9@WRXALEdB7e>jn?<EVL;3
+IHi@<KD7K?bBY4ee:gIO9b0
+R0
+R2
+R9
+R10
+L0 173
+R3
+R4
+R5
+R6
+!i113 0
+R7
+R8
+vtop
+R1
+r1
+!s85 0
+31
+!i10b 1
+!s100 KkcbYC2`@0=FQ8W97L`CO3
+I0U2FUG_>^:^XoPKA`Y@Sf3
+R0
+R2
+8/fs/student/jaoviedo/MIPS_single_cycle_proc/mipstop.v
+F/fs/student/jaoviedo/MIPS_single_cycle_proc/mipstop.v
+L0 3
+R3
+R4
+R5
+R6
+!i113 0
+R7
+R8
+vzeroextend
+R1
+r1
+!s85 0
+31
+!i10b 1
+!s100 YeK>c3_dhiKcZT8Kbfok?3
+I5XXAYIJMl8Y`<G_96FdRj3
+R0
+R2
+R9
+R10
+L0 187
+R3
+R4
+R5
+R6
+!i113 0
+R7
+R8

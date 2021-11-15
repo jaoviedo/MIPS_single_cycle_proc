@@ -67,12 +67,12 @@ module maindec(input [5:0] op,
     
     reg [10:0] controls;
 
-    assign {regwrite, regdst, alusrc, branch, memwrite, aluop,
+    assign {regwrite, regdst, alusrc, branch, memwrite, memtoreg, aluop,
             jump,eqorne,signzero} = controls;
 
     always @(*) begin
         case(op)
-            6'b000000: controls <= 11'b11000010000; // RTYPE
+            6'b000000: controls <= 11'b11000010000; // R-TYPE
             6'b100011: controls <= 11'b10100100000; // LW
             6'b101011: controls <= 11'b00101000000; // SW
             6'b000100: controls <= 11'b00010001000; // BEQ
@@ -87,14 +87,14 @@ endmodule
 
 module aludec(input [5:0] funct,
               input [1:0] aluop,
-              output reg [2:0] alucontol);
+              output reg [2:0] alucontrol);
     
     always@(*)begin
         case(aluop)
             2'b00: alucontrol <= 3'b010; // ADD
             2'b01: alucontrol <= 3'b110; // SUB
             2'b11: alucontrol <= 3'b001; // OR 
-            default: case(funct) // R-TYPE
+            2'b10: case(funct) // R-TYPE
                 6'b100000: alucontrol <= 3'b010; // ADD
                 6'b100010: alucontrol <= 3'b110; // SUB
                 6'b100100: alucontrol <= 3'b000; // AND
@@ -137,7 +137,7 @@ mux2 #(32)      pcmux(pcnextbr, {pcplus4[31:28],
 
 // register file logic
 regfile         rf(clk, regwrite, instr[25:21], instr[20:16],
-                   writereg, result, srca, writedata); // RS register read into srca, RT register read into writedata\
+                   writereg, result, srca, writedata); // RS register read into srca, RT register read into writedata
 mux2 #(5)       wrmux(instr[20:16], instr[15:11],
                       regdst, writereg);
 mux2 #(32)      resmux(aluout,readdata,memtoreg, result);
@@ -147,7 +147,7 @@ zeroextend      ze(instr[15:0], zeroimm);
 // ALU Logic
 mux2 #(32)      aluimmmux(signimm, zeroimm, signzero, aluimm);
 mux2 #(32)      srcbmux(writedata, aluimm, alusrc, srcb);
-alu             bigboyalu(srca,srcb, alucontol, aluout, zero);
+ALU             bigboyalu(srca,srcb, alucontol, aluout, zero);
                 
 endmodule
 
@@ -213,6 +213,12 @@ module mux2 #(parameter WIDTH = 8)
               output [WIDTH-1:0] y);
 
     assign y = s ? d1: d0;              
+endmodule
+
+module adder (input [31:0] a, b,
+	      output [31:0] y);
+	
+	assign y = a + b;
 endmodule
 
 
