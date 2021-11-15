@@ -10,16 +10,19 @@ module mips(input          clk, reset,
 
   wire        memtoreg, branch,
                pcsrc, zero,
-               alusrc, regdst, regwrite, jump;
+               alusrc, regdst, regwrite, jump,
+               eqorne, signzero;
 
   wire [2:0]  alucontrol;
 
   controller c(instr[31:26], instr[5:0], zero,
                memtoreg, memwrite, pcsrc,
                alusrc, regdst, regwrite, jump,
+               eqorne, signzero,
                alucontrol);
   datapath dp(clk, reset, memtoreg, pcsrc,
               alusrc, regdst, regwrite, jump,
+              signzero,
               alucontrol,
               zero, pc, instr,
               aluout, writedata, readdata);
@@ -38,16 +41,19 @@ module controller(input   [5:0] op, funct,
 
 // **PUT YOUR CODE HERE**
 
-    wire branch;
+    wire branch, bne, beq;
     wire [1:0] aluop;
 
-    maindec md(op, memtoreg, memwrite, branch,
-               alusrc, regdst, regwrite, jump, eqorne,
-               signzero, aluop);
+    maindec     md(op, memtoreg, memwrite, branch,
+                   alusrc, regdst, regwrite, jump, eqorne,
+                   signzero, aluop);
 
-    aludec ad(funct, aluop, alucontrol);
+    aludec      ad(funct, aluop, alucontrol);
+    
+    assign beq = branch & zero;
+    assign bne = branch & ~zero;
 
-    assign pcsrc = branch & zero; // TODO : FIX WITH MUX
+    mux2 #(1)   pcsrcmux(beq,bne,eqorne,pcsrc);
 
 endmodule
 
@@ -81,7 +87,7 @@ endmodule
 
 module aludec(input [5:0] funct,
               input [1:0] aluop,
-              output [2:0] alucontol);
+              output reg [2:0] alucontol);
     
     always@(*)begin
         case(aluop)
@@ -105,6 +111,7 @@ module datapath(input          clk, reset,
                 input          memtoreg, pcsrc,
                 input          alusrc, regdst,
                 input          regwrite, jump,
+                input          signzero, 
                 input   [2:0]  alucontrol,
                 output         zero,
                 output  [31:0] pc,
@@ -112,14 +119,42 @@ module datapath(input          clk, reset,
                 output  [31:0] aluout, writedata,
                 input   [31:0] readdata);
 
-// **PUT YOUR CODE HERE**                
+// **PUT YOUR CODE HERE**
+wire [4:0] writereg;
+wire [31:0] pcnext, pcnextbr, pcplus4, pcbranch;
+wire [31:0] signimm, signimmsh, zeroimm, aluimm;
+wire [31:0] srca, srcb;
+wire [31:0] result;        
+
+// next PC logic
+flopr #(32)     pcreg(clk, reset, pcnext, pc); // PC' and PC register
+adder           pcaddl(pc,32'b100,pcplus4); // PCPlus4 calculated
+sl2             immsh(signimm,signimmsh); // Word allign the sign extended imm
+adder           pcadd2(pcplus4, signimmsh, pcbranch); // PCBranch calculated 
+mux2 #(32)      pcbrmux(pcplus4, pcbranch, pcsrc, pcnextbr); // Where the branch PC' is
+mux2 #(32)      pcmux(pcnextbr, {pcplus4[31:28],
+                      instr[25:0],2'b00}, jump, pcnext); // This is where the jump is handled
+
+// register file logic
+regfile         rf(clk, regwrite, instr[25:21], instr[20:16],
+                   writereg, result, srca, writedata); // RS register read into srca, RT register read into writedata\
+mux2 #(5)       wrmux(instr[20:16], instr[15:11],
+                      regdst, writereg);
+mux2 #(32)      resmux(aluout,readdata,memtoreg, result);
+signextend      se(instr[15:0], signimm);
+zeroextend      ze(instr[15:0], zeroimm);
+
+// ALU Logic
+mux2 #(32)      aluimmmux(signimm, zeroimm, signzero, aluimm);
+mux2 #(32)      srcbmux(writedata, aluimm, alusrc, srcb);
+alu             bigboyalu(srca,srcb, alucontol, aluout, zero);
                 
 endmodule
 
 module regfile(input clk,
                input we3,
                input [4:0] ra1, ra2, wa3,
-               output [31:0] wd3,
+               input  [31:0] wd3,
                output [31:0] rd1, rd2);
 
     reg [31:0] rf[31:0];
@@ -134,4 +169,50 @@ module regfile(input clk,
     assign rd2 = (ra2 != 0) ? rf[ra2] : 0;
 
 endmodule
+
+module sl2(input [31:0] a,
+           output [31:0] y);
+
+    assign y = a << 2;
+
+endmodule
+
+module signextend(input [15:0] a,
+                  output [31:0] y);
+
+    assign y = {{16{a[15]}},a};
+
+endmodule
+
+module zeroextend(input [15:0] a,
+                  output [31:0] y);
+
+    assign y = {{16{1'b0}},a};
+
+endmodule
+
+module flopr #(parameter WIDTH=8)
+              (input clk, reset,
+               input [WIDTH-1:0] d,
+               output reg [WIDTH-1:0] q);
+    
+    always @(posedge clk, posedge reset) begin
+        if(reset) begin
+            q <= 0;
+        end
+        else begin
+            q <= d;
+        end
+    end
+
+endmodule
+
+module mux2 #(parameter WIDTH = 8)
+             (input [WIDTH-1:0] d0, d1,
+              input s,
+              output [WIDTH-1:0] y);
+
+    assign y = s ? d1: d0;              
+endmodule
+
 
