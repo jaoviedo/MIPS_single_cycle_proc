@@ -29,7 +29,6 @@ module mips(input          clk, reset,
 endmodule
 
 
-// Todo: Implement controller module
 module controller(input   [5:0] op, funct,
                   input         zero,
                   output        memtoreg, memwrite,
@@ -39,22 +38,24 @@ module controller(input   [5:0] op, funct,
                   output        signzero,
                   output  [2:0] alucontrol);
 
-// **PUT YOUR CODE HERE**
 
-    wire branch, bne, beq;
+    wire branch;
+    reg bne, beq;
     wire [1:0] aluop;
+
+    aludec      ad(funct, aluop, alucontrol);
 
     maindec     md(op, memtoreg, memwrite, branch,
                    alusrc, regdst, regwrite, jump, eqorne,
                    signzero, aluop);
-
-    aludec      ad(funct, aluop, alucontrol);
-    
-    assign beq = branch & zero;
-    assign bne = branch & ~zero;
-
+////////////////////// BNE MODIFICATIONS ///////////////////////////////
     mux2 #(1)   pcsrcmux(beq,bne,eqorne,pcsrc);
 
+    always@(branch)begin
+        beq = branch ? (branch & zero):0;
+        bne = branch ? (branch & ~zero):0;
+    end
+    
 endmodule
 
 module maindec(input [5:0] op,
@@ -63,24 +64,24 @@ module maindec(input [5:0] op,
                output regdst, regwrite,
                output jump, eqorne,
                output signzero,
-               output [1:0] aluop);
+               output  [1:0] aluop);
     
     reg [10:0] controls;
 
     assign {regwrite, regdst, alusrc, branch, memwrite, memtoreg, aluop,
             jump,eqorne,signzero} = controls;
 
-    always @(*) begin
+    always @(op) begin
         case(op)
-            6'b000000: controls <= 11'b11000010000; // R-TYPE
-            6'b100011: controls <= 11'b10100100000; // LW
-            6'b101011: controls <= 11'b00101000000; // SW
-            6'b000100: controls <= 11'b00010001000; // BEQ
-            6'b001000: controls <= 11'b10100000000; // ADDI
-            6'b000010: controls <= 11'b00000000100; // J
-            6'b001101: controls <= 11'b10100011001; // ORI
-            6'b000101: controls <= 11'b00010001010; // BNE
-            default:   controls <= 11'bxxxxxxxxxxx; // Illegal OP
+            6'b000000: controls = 11'b11000010000; // R-TYPE
+            6'b100011: controls = 11'b10100100000; // LW
+            6'b101011: controls = 11'b00101000000; // SW
+            6'b000100: controls = 11'b00010001000; // BEQ
+            6'b001000: controls = 11'b10100000000; // ADDI
+            6'b000010: controls = 11'b00000000100; // J
+            6'b001101: controls = 11'b10100011001; // ***ORI***
+            6'b000101: controls = 11'b00010001010; // ***BNE***
+            default:   controls = 11'bxxxxxxxxxxx; // Illegal OP
         endcase
     end
 endmodule
@@ -89,24 +90,28 @@ module aludec(input [5:0] funct,
               input [1:0] aluop,
               output reg [2:0] alucontrol);
     
-    always@(*)begin
+    wire [5:0] ALUControlIn;
+    assign ALUControlIn = {aluop, funct};
+    always@(aluop, funct)begin
         case(aluop)
-            2'b00: alucontrol <= 3'b010; // ADD
-            2'b01: alucontrol <= 3'b110; // SUB
-            2'b11: alucontrol <= 3'b001; // OR 
-            2'b10: case(funct) // R-TYPE
-                6'b100000: alucontrol <= 3'b010; // ADD
-                6'b100010: alucontrol <= 3'b110; // SUB
-                6'b100100: alucontrol <= 3'b000; // AND
-                6'b100101: alucontrol <= 3'b001; // OR
-                6'b101010: alucontrol <= 3'b111; // SLT
-                default: alucontrol <= 3'bxxx; // Unknown
-            endcase
+            2'b00: alucontrol = 3'b010; // ADD
+            2'b01: alucontrol = 3'b110; // SUB
+            2'b11: alucontrol = 3'b001; // OR 
+            default: begin 
+               case(funct) // R-TYPE
+                  6'b100000: alucontrol = 3'b010; // ADD
+                  6'b100010: alucontrol = 3'b110; // SUB
+                  6'b100100: alucontrol = 3'b000; // AND
+                  6'b100101: alucontrol = 3'b001; // OR
+                  6'b101010: alucontrol = 3'b111; // SLT
+                  //default: alucontrol = 3'bxxx; // Unknown
+              endcase
+           end
         endcase
     end
 endmodule
 
-// Todo: Implement datapath
+
 module datapath(input          clk, reset,
                 input          memtoreg, pcsrc,
                 input          alusrc, regdst,
@@ -119,7 +124,7 @@ module datapath(input          clk, reset,
                 output  [31:0] aluout, writedata,
                 input   [31:0] readdata);
 
-// **PUT YOUR CODE HERE**
+
 wire [4:0] writereg;
 wire [31:0] pcnext, pcnextbr, pcplus4, pcbranch;
 wire [31:0] signimm, signimmsh, zeroimm, aluimm;
@@ -142,12 +147,12 @@ mux2 #(5)       wrmux(instr[20:16], instr[15:11],
                       regdst, writereg);
 mux2 #(32)      resmux(aluout,readdata,memtoreg, result);
 signextend      se(instr[15:0], signimm);
-zeroextend      ze(instr[15:0], zeroimm);
+zeroextend      ze(instr[15:0], zeroimm); ///////////////// *** MODIFICATION FOR ORI ***
 
-// ALU Logic
+// ALU Logic *** MODIFICATIONS FOR ORI ***
 mux2 #(32)      aluimmmux(signimm, zeroimm, signzero, aluimm);
 mux2 #(32)      srcbmux(writedata, aluimm, alusrc, srcb);
-ALU             bigboyalu(srca,srcb, alucontol, aluout, zero);
+ALU             bigboyalu(.a(srca),.b(srcb), .f(alucontrol), .y(aluout), .zero(zero));
                 
 endmodule
 

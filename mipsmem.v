@@ -1,11 +1,9 @@
 // External memories used by MIPS single-cycle processor
 
-// Todo: Implement data memory
 module dmem(input          clk, we,
             input   [31:0] a, wd,
             output  [31:0] rd);
 
-// **PUT YOUR CODE HERE**
 reg [31:0] RAM[63:0];
 
 assign rd = RAM[a[31:2]];
